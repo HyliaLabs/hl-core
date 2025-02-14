@@ -1,0 +1,66 @@
+name: "CodeQL Analysis"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 3 * * 1'  # Wöchentlicher Scan (Montags um 03:00 Uhr UTC)
+
+jobs:
+  analyze:
+    name: Analyze Code with CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [python]  # Falls du mehrere Sprachen analysieren willst, füge sie hier hinzu.
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          output: ../results
+          upload: always
+          cleanup-level: brutal
+          add-snippets: false
+          skip-queries: false
+          checkout_path: /home/runner/work/hl-core/hl-core
+          upload-database: true
+          wait-for-processing: true
+
+      - name: Upload SARIF report to GitHub
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: /home/runner/work/hl-core/results/python.sarif
+
+      - name: Check for security alerts
+        run: |
+          echo "Security scan completed. Check the results at:"
+          echo "https://github.com/HyliaLabs/hl-core/security/code-scanning"
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  CODEQL_ACTION_FEATURE_MULTI_LANGUAGE: false
+  CODEQL_ACTION_FEATURE_SANDWICH: false
+  CODEQL_ACTION_FEATURE_SARIF_COMBINE: true
+  CODEQL_ACTION_FEATURE_WILL_UPLOAD: true
+  CODEQL_ACTION_INIT_HAS_RUN: true
+  CODEQL_RAM: 6914
+  CODEQL_THREADS: 2
+  CODEQL_EXTRACTOR_PYTHON_EXTRACT_STDLIB: true
