@@ -11,7 +11,7 @@ on:
   pull_request:
     branches: [main]
   schedule:
-    - cron: '0 3 * * 1'  # Wöchentlicher Scan (Montags um 03:00 Uhr UTC)
+    - cron: '0 3 * * 1'  # Wöchentlicher Scan (Montags um 03:00 Uhr UTC))
 
 jobs:
   analyze:
@@ -25,7 +25,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+<<<<<<< HEAD
         language: [python]  # Falls du mehrere Sprachen analysieren willst, füge sie hier hinzu.
+=======
+        language: [python]
+>>>>>>> 9edc422 (Added CodeQL GitHub Actions workflow)
 
     steps:
       - name: Checkout repository
@@ -35,6 +39,7 @@ jobs:
         uses: github/codeql-action/init@v2
         with:
           languages: ${{ matrix.language }}
+<<<<<<< HEAD
           queries: +security-and-quality
 
       - name: Perform CodeQL Analysis
@@ -69,3 +74,8 @@ env:
   CODEQL_RAM: 6914
   CODEQL_THREADS: 2
   CODEQL_EXTRACTOR_PYTHON_EXTRACT_STDLIB: true
+=======
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+>>>>>>> 9edc422 (Added CodeQL GitHub Actions workflow)
